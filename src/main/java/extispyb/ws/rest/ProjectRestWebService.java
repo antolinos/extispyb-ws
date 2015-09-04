@@ -1,7 +1,6 @@
 package extispyb.ws.rest;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.FormParam;
@@ -29,15 +28,10 @@ public class ProjectRestWebService extends RestWebService {
 		params.put("token", String.valueOf(token));
 		long start = this.logInit("getProjectList", getGson().toJson(params));
 		try {
-			//TODO: TO BE CHANGED BY TOKEN
-//			User user = User.getByName("opd29");
 			User user = User.getByToken(token);
-//			if (user == null){
-//				user = User.init("opd29", UUID.randomUUID().toString());
-//				user = User.init("opd29", UUID.randomUUID().toString());
-//			}  
-			//User user = this.getUserByToken(token);
-			return sendResponse(user.getProjects());
+			if (user != null){
+				return sendResponse(user.getProjects());
+			}
 		} catch (Exception e) {
 			this.logError("getProjectList", start, e.getMessage(), e);
 		}
@@ -113,7 +107,7 @@ public class ProjectRestWebService extends RestWebService {
 		try {
 			Project project = Project.getByInternalId(internalId);
 			if (project != null) {
-				Run run = new Run(toolName, "");
+				Run run = new Run(toolName, "", "");
 				run.setInputs(input);
 				project.getRuns().add(run);
 				project.save();

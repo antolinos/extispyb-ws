@@ -3,8 +3,6 @@ package extispyb.ws.rest;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.Consumes;
@@ -13,23 +11,20 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.james.mime4j.field.datetime.DateTime;
-import org.bson.types.ObjectId;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import com.google.gson.reflect.TypeToken;
-import com.mongodb.gridfs.GridFSDBFile;
-
-import tool.JobForm;
+import tool.DimpleMultipartForm;
 import tool.StructureValidationMultipartForm;
+
+import com.google.gson.reflect.TypeToken;
+
 import extispyb.core.collection.Job;
-import extispyb.core.collection.MongoIOUtils;
 import extispyb.core.collection.Param;
 import extispyb.core.collection.Project;
 import extispyb.core.collection.Run;
+import extispyb.core.collection.User;
 
 @Path("/")
 public class ToolRestWebService extends RestWebService {
@@ -41,22 +36,39 @@ public class ToolRestWebService extends RestWebService {
 	public Response runCrysol(
 			@PathParam("token") String token,
 			@MultipartForm StructureValidationMultipartForm form) throws IllegalStateException, IOException{
-				
-		System.out.println("UPLOAD FILE");
-		System.out.println("------------");
-		System.out.println("Filename: " + form.getPdbFileName());
-		System.out.println(form.getProjectId());
-		System.out.println(form.getSubtractionId());
-		System.out.println(form.getPdbFileName());
 		form.run(token);
-		return sendResponse("ok");
+		
+		User user = User.getByToken(token);
+		if (user != null){
+			return sendResponse(user.getProjects());
+		}
+			
+		return this.sendResponse(new String("ok"));
 	}
+	
+	@PermitAll
+	@POST
+	@Path("rest/{token}/tool/dimple/run")
+	@Consumes("multipart/form-data")
+	@Produces({ "application/json" })
+	public Response runDimple(
+			@PathParam("token") String token,
+			@MultipartForm DimpleMultipartForm form) throws IllegalStateException, IOException{
+		form.run(token);
+		User user = User.getByToken(token);
+		if (user != null){
+			return sendResponse(user.getProjects());
+		}
+			
+		return this.sendResponse(new String("ok"));
+	}
+	
 	
 	
 	@PermitAll
 	@POST
 	@Path("rest/{token}/project/{projectId}/run/{runId}/job/add")
-	@Produces({ "application/json" })
+	@Produces("text/plain")
 	public Response addJon(
 			@PathParam("token") String token,
 			@PathParam("projectId") String projectId,
@@ -103,7 +115,7 @@ public class ToolRestWebService extends RestWebService {
 		else{
 			throw new Exception("Project does not exist");
 		}
-		return sendResponse("ok");
+		return this.sendResponse(new String("ok"));
 	}
 	
 	

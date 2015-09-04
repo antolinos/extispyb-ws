@@ -33,6 +33,7 @@ public class Run extends EntityObject{
 	@Id 
 	private ObjectId id;
 	protected String name;
+	protected String tool;
 	protected String description;
 	protected Status status;
 	protected Date start;
@@ -49,7 +50,8 @@ public class Run extends EntityObject{
 	public Run(){
 	}
 	
-	public Run(String name, String description){
+	public Run(String tool, String name, String description){
+		this.tool = tool;
 		this.name = name;
 		this.setDescription(description);
 		this.creationDate = Calendar.getInstance().getTime();
