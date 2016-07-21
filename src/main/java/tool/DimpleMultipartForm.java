@@ -14,6 +14,8 @@ import extispyb.core.collection.MongoIOUtils;
 import extispyb.core.collection.Project;
 import extispyb.core.collection.Run;
 import extispyb.core.collection.Run.Status;
+import extispyb.core.collection.User;
+import extispyb.core.configuration.*;
 
 public class DimpleMultipartForm extends ToolMultipartForm {
 
@@ -78,15 +80,14 @@ public class DimpleMultipartForm extends ToolMultipartForm {
 		project.getRuns().add(run);
 		project.save();
 		
-		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
-		urlParameters.add(new BasicNameValuePair("token", token));
-		urlParameters.add(new BasicNameValuePair("projectId", project.getInternalId()));
-		urlParameters.add(new BasicNameValuePair("runId", run.getInternalId()));
-		urlParameters.add(new BasicNameValuePair("pdbFileId", pdbFileId));
-		urlParameters.add(new BasicNameValuePair("mtzFileId", mtzFileId));
 		
+		List<NameValuePair> urlParameters = this.getGenericParameters(token, project, run);
+		urlParameters.add(new BasicNameValuePair("pdbFile", String.format("%s/file/%s/download", this.getServerURL(), pdbFileId)));
+		urlParameters.add(new BasicNameValuePair("mtzFile", String.format("%s/file/%s/download", this.getServerURL(), mtzFileId)));
 		this.launch(urlParameters, "dimple");
 	}
+
+	
 	
 	
 }

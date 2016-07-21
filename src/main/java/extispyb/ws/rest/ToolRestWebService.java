@@ -15,8 +15,7 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import tool.DimpleMultipartForm;
-import tool.StructureValidationMultipartForm;
+import tool.*;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -54,6 +53,41 @@ public class ToolRestWebService extends RestWebService {
 	public Response runDimple(
 			@PathParam("token") String token,
 			@MultipartForm DimpleMultipartForm form) throws IllegalStateException, IOException{
+		form.run(token);
+		User user = User.getByToken(token);
+		if (user != null){
+			return sendResponse(user.getProjects());
+		}
+			
+		return this.sendResponse(new String("ok"));
+	}
+	
+	@PermitAll
+	@POST
+	@Path("rest/{token}/tool/dimpledc/run")
+	@Consumes("multipart/form-data")
+	@Produces({ "application/json" })
+	public Response runDimpleDataCollection(
+			@PathParam("token") String token,
+			@MultipartForm DimpleDCMultipartForm form) throws IllegalStateException, IOException{
+		form.run(token);
+		User user = User.getByToken(token);
+		if (user != null){
+			return sendResponse(user.getProjects());
+		}
+			
+		return this.sendResponse(new String("ok"));
+	}
+	
+	@PermitAll
+	@POST
+	@Path("rest/{token}/tool/reprocess/run")
+	@Consumes("multipart/form-data")
+	@Produces({ "application/json" })
+	public Response reprocess(
+			@PathParam("token") String token,
+			@MultipartForm ReprocessMultipartForm form) throws IllegalStateException, IOException{
+		System.out.println("SENT ----------");
 		form.run(token);
 		User user = User.getByToken(token);
 		if (user != null){

@@ -78,6 +78,8 @@ public class Run extends EntityObject{
 	}
 	public Date getEnd() {
 		return end;
+		
+		
 	}
 	public void setEnd(Date end) {
 		this.end = end;
